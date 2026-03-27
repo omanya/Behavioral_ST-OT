@@ -45,6 +45,7 @@ stations <- raw_data %>%
 
 #Load weather data
 load("wdata.Rdata") # daily weather data for 2025 in NYC central park weather station from https://www.ncei.noaa.gov/access/search/data-search/daily-summaries
+wdata = transform(wdata, PRCP=PRCP/10, TMIN = TMIN/10, TMAX=TMAX/10)
 ```
 
 ## Define the Functions
