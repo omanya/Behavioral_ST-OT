@@ -388,12 +388,12 @@ kable(robust_summary[,c(1,2,5)],digits = 3, caption = "The estimation results of
 
 | term                             | estimate | p.value |
 |:---------------------------------|---------:|--------:|
-| $\beta_0$ (Intercept)            |   43.456 |   0.000 |
-| $\beta_1$ (Weekend)              |   19.205 |   0.000 |
-| $\beta_2$ (Rainy)                |   -5.718 |   0.000 |
-| $\beta_3$ (Temp)                 |    0.054 |   0.000 |
-| $\beta_4$ (Weekend$\cdot$Rainy)  |   -6.548 |   0.082 |
-| $\beta_{5}$ (Weekend$\cdot$Temp) |    0.077 |   0.000 |
+| $\beta_0$ (Intercept)            |   42.500 |   0.000 |
+| $\beta_1$ (Weekend)              |   15.948 |   0.000 |
+| $\beta_2$ (Rain)                 |   -0.259 |   0.001 |
+| $\beta_3$ (Temp)                 |    0.524 |   0.000 |
+| $\beta_4$ (Weekend$\cdot$Rain)   |   -0.365 |   0.189 |
+| $\beta_{5}$ (Weekend$\cdot$Temp) |    0.895 |   0.000 |
 
 The estimation results of the linear interaction model in (2) with HAC
 standard errors for $p$-values computation.
