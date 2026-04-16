@@ -2,7 +2,7 @@ Discovering Urban Mobility Patterns through Spatio-Temporal Optimal
 Transport and Behavioral Calibration
 ================
 Maria Osipenko, Fanqi Meng
-2026-03-27
+2026-04-16
 
 ## Load the Data
 
@@ -37,7 +37,7 @@ source("functions.R")
 compute_cost <- function(C_spatial_informed, st_grid, gamma = 1){
   n_nodes <- nrow(st_grid)
   C_st <- matrix(Inf, n_nodes, n_nodes)
-  # Fill C_st using our 10x10 OSRM neighborhood travel times
+  # Fill C_st using 10x10 OSRM neighborhood travel times
   for(r in 1:n_nodes) {
     for(c in 1:n_nodes) {
       # Causal constraint: can't travel backward in time
@@ -249,12 +249,11 @@ ggplot() +
 #       row_idx <- node_lookup[st_counts$from_node[i]]
 #       col_idx <- node_lookup[st_counts$to_node[i]]
 #       
-#       # Only fill if the nodes exist in our study grid
+#       # Only fill if the nodes exist in the grid
 #       if(!is.na(row_idx) & !is.na(col_idx)) {
 #         Q_prior[row_idx, col_idx] <- st_counts$n[i]
 #       }
 #     }
-#     # Assign names from your grid to the matrix
 #     rownames(Q_prior) <- colnames(Q_prior) <- st_grid_wd[[wd+1]]$Node_ID
 #     Q_prior_wd[[wd+1]] <- Q_prior
 #   }
@@ -373,6 +372,67 @@ bind_rows(summary_stats, total_stats) %>%
 Spatio-Temporal Model Performance Metrics (CPC and MAE) in Total and per
 Day Type.
 
+``` r
+# # SHanon entropy
+# calc_entropy <- function(Q_matrix) {
+#   # Normalize to sum to 1 to treat as probability
+#   p <- Q_matrix / sum(Q_matrix)
+#   p <- p[p > 0] # Remove zeros to avoid log(0)
+#   return(-sum(p * log(p)))
+# }
+# #priors
+# months = c(paste0("0",1:9), 10:12)
+# entr_df = NULL
+# for(m in 1:length(months)){
+#   print(months[m])
+#   #preprocess
+#   data_pro = process_data_wd(raw_data)
+#   ##################################################### HABITS ##########################
+#   st_grid_wd = list()
+#   #wd
+#   for (wd in 0:6){
+#     st_grid_wd[[wd+1]] <- data_pro$st_grid[grepl(paste0("_",wd), data_pro$st_grid$Node_ID),]
+#   }
+#   Q_prior_wd = list()
+#   for(wd in 0:6){
+#     n_nodes <- nrow(st_grid_wd[[wd+1]])
+#     node_lookup <- setNames(1:n_nodes, st_grid_wd[[wd+1]]$Node_ID)
+#     Q_prior <- matrix(0, nrow = n_nodes, ncol = n_nodes)
+#     st_counts <- data_pro$trips_mapped[data_pro$trips_mapped$wd == wd,] %>%
+#       mutate(
+#         from_node = paste0(start_neigh, "_T", T_Start, "_",wd),
+#         to_node = paste0(end_neigh, "_T", T_End, "_",wd)
+#       ) %>%
+#       count(from_node, to_node)
+#     #  Fill the matrix
+#     for(i in 1:nrow(st_counts)) {
+#       row_idx <- node_lookup[st_counts$from_node[i]]
+#       col_idx <- node_lookup[st_counts$to_node[i]]
+# 
+#       # Only fill if the nodes exist in the grid
+#       if(!is.na(row_idx) & !is.na(col_idx)) {
+#         Q_prior[row_idx, col_idx] <- st_counts$n[i]
+#       }
+#     }
+#     rownames(Q_prior) <- colnames(Q_prior) <- st_grid_wd[[wd+1]]$Node_ID
+#   entr = calc_entropy(Q_prior)
+#   entr_df = rbind(entr_df, cbind(m=months[m], wd = wd, entr = entr))
+#   }
+# }
+# save(entr_df, file="entr_df.RData")
+```
+
+<div class="figure">
+
+<img src="Behavioral_ST-OT_files/figure-gfm/figQ-1.png" alt="Prior entropy $H(\hat{\mathbf Q}_{m,w})$ dynamics over months and days of week. ($H(\hat{\mathbf Q}_{m,w})$ measures the Shannon Entropy of the historical flow distributions.)" width="100%" />
+<p class="caption">
+Prior entropy $H(\hat{\mathbf Q}_{m,w})$ dynamics over months and days
+of week. ($H(\hat{\mathbf Q}_{m,w})$ measures the Shannon Entropy of the
+historical flow distributions.)
+</p>
+
+</div>
+
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ## ℹ Please use `linewidth` instead.
     ## This warning is displayed once per session.
@@ -448,13 +508,17 @@ pvalue(perm_test)
     ##  0.0000000000 0.0005296914
 
 ``` r
+df_best_all_w = transform(df_best_all_w, m = format(date, "%m"))
+df_best_all_m = merge(df_best_all_w, entr_df[,c("m","wd","entr")],by.x=c("m","wd"), by.y=c("m","wd"), all.x=T)
+df_best_all_m = transform(df_best_all_m, mywd = ifelse(wd%in%c(2,3,4,5), wd, 0))
+df_best_all_m = transform(df_best_all_m, hq = scale(entr))
 #Interaction model
-interaction_model <- lm(epsilon ~ Is_Weekend+ PRCP + Daily_Temp + Is_Weekend * PRCP + Is_Weekend * Daily_Temp,
-                        data = df_best_all_w)
+interaction_model <- lm(epsilon ~ Is_Weekend+ PRCP + Daily_Temp + Is_Weekend * PRCP + Is_Weekend * Daily_Temp + hq+m+mywd,
+                        data = df_best_all_m)
 
 #Calculate Newey-West robust standard errors
 robust_cov <- NeweyWest(interaction_model, lag = NULL, prewhite = FALSE)
-#Apply the robust covariance to your model summary
+#Apply the robust covariance
 robust_summary <- coeftest(interaction_model, vcov = robust_cov)
 #Transform to a tidy kable table
 beta_labels <- c(
@@ -465,19 +529,24 @@ beta_labels <- c(
   "$\\beta_4$ (Weekend$\\cdot$Rain)",
   "$\\beta_{5}$ (Weekend$\\cdot$Temp)"
 )
-robust_summary = tidy(robust_summary) %>%
+
+var_effs = c("(Intercept)","Is_WeekendTRUE","PRCP","Daily_Temp","Is_WeekendTRUE:PRCP","Is_WeekendTRUE:Daily_Temp")
+robust_summary = tidy(robust_summary) 
+
+robust_summary <-  robust_summary[robust_summary$term%in%var_effs,] %>%
   mutate(term = beta_labels) 
+
 kable(robust_summary[,c(1,2,5)],digits = 3, caption = "The estimation results of the linear interaction model in (2) with HAC standard errors for $p$-values computation.", escape=F)
 ```
 
 | term                             | estimate | p.value |
 |:---------------------------------|---------:|--------:|
-| $\beta_0$ (Intercept)            |   42.500 |   0.000 |
-| $\beta_1$ (Weekend)              |   15.948 |   0.000 |
-| $\beta_2$ (Rain)                 |   -0.259 |   0.001 |
-| $\beta_3$ (Temp)                 |    0.524 |   0.000 |
-| $\beta_4$ (Weekend$\cdot$Rain)   |   -0.365 |   0.189 |
-| $\beta_{5}$ (Weekend$\cdot$Temp) |    0.895 |   0.000 |
+| $\beta_0$ (Intercept)            |   35.652 |   0.000 |
+| $\beta_1$ (Weekend)              |   19.714 |   0.000 |
+| $\beta_2$ (Rain)                 |   -0.277 |   0.003 |
+| $\beta_3$ (Temp)                 |    0.906 |   0.000 |
+| $\beta_4$ (Weekend$\cdot$Rain)   |   -0.362 |   0.151 |
+| $\beta_{5}$ (Weekend$\cdot$Temp) |    1.027 |   0.000 |
 
 The estimation results of the linear interaction model in (2) with HAC
 standard errors for $p$-values computation.
