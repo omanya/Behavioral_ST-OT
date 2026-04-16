@@ -424,7 +424,7 @@ Day Type.
 
 <div class="figure">
 
-<img src="Behavioral_ST-OT_files/figure-gfm/figQ-1.png" alt="Prior entropy $H(\hat{\mathbf Q}_{m,w})$ dynamics over months and days of week. ($H(\hat{\mathbf Q}_{m,w})$ measures the Shannon Entropy of the historical flow distributions.)" width="100%" />
+<img src="figQ-1.png" alt="Prior entropy $H(\hat{\mathbf Q}_{m,w})$ dynamics over months and days of week. ($H(\hat{\mathbf Q}_{m,w})$ measures the Shannon Entropy of the historical flow distributions.)" width="100%" />
 <p class="caption">
 Prior entropy $H(\hat{\mathbf Q}_{m,w})$ dynamics over months and days
 of week. ($H(\hat{\mathbf Q}_{m,w})$ measures the Shannon Entropy of the
@@ -444,7 +444,7 @@ historical flow distributions.)
 
 <div class="figure">
 
-<img src="Behavioral_ST-OT_files/figure-gfm/figeps-1.png" alt="The longitudal trajectors of the calibrated $\epsilon^*_t$ values reflecting systemic entropy. Shaded regions represent weekends. Dashed line marks the average value." width="100%" />
+<img src="figeps-1.png" alt="The longitudal trajectors of the calibrated $\epsilon^*_t$ values reflecting systemic entropy. Shaded regions represent weekends. Dashed line marks the average value." width="100%" />
 <p class="caption">
 The longitudal trajectors of the calibrated $\epsilon^*_t$ values
 reflecting systemic entropy. Shaded regions represent weekends. Dashed
@@ -455,7 +455,7 @@ line marks the average value.
 
 <div class="figure">
 
-<img src="Behavioral_ST-OT_files/figure-gfm/figvww-1.png" alt="Violin plots of the distributions of the obtained $\epsilon^*_t$ values for different influence variables such as the social cycle (left panel) and weather conditions (precipitation: middle panel, temperature: right panel)." width="100%" />
+<img src="figvww-1.png" alt="Violin plots of the distributions of the obtained $\epsilon^*_t$ values for different influence variables such as the social cycle (left panel) and weather conditions (precipitation: middle panel, temperature: right panel)." width="100%" />
 <p class="caption">
 Violin plots of the distributions of the obtained $\epsilon^*_t$ values
 for different influence variables such as the social cycle (left panel)
@@ -467,7 +467,7 @@ panel).
 
 <div class="figure">
 
-<img src="Behavioral_ST-OT_files/figure-gfm/figvr-1.png" alt="Violin plots of the distributions of the obtained $\epsilon^*_t$ values for weekdays versus weekend and for different combinations of weather regimes, such as clear (orange color) or rainy (blue color) states, and cold (left panel), moderate (moiddle panel), warm (right panel) temperature regimes." width="100%" />
+<img src="figvr-1.png" alt="Violin plots of the distributions of the obtained $\epsilon^*_t$ values for weekdays versus weekend and for different combinations of weather regimes, such as clear (orange color) or rainy (blue color) states, and cold (left panel), moderate (moiddle panel), warm (right panel) temperature regimes." width="100%" />
 <p class="caption">
 Violin plots of the distributions of the obtained $\epsilon^*_t$ values
 for weekdays versus weekend and for different combinations of weather
